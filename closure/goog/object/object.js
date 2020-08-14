@@ -504,18 +504,19 @@ goog.object.clone = function(obj) {
  * @template T
  */
 goog.object.unsafeClone = function(obj) {
-  if (!obj || typeof obj !== 'object') return obj;
-  if (typeof obj.clone === 'function') return obj.clone();
-  const clone = Array.isArray(obj) ? [] :
-      typeof Uint8Array === 'function' &&
-          obj instanceof
-              Object.getPrototypeOf(Uint8Array.prototype).constructor ?
-                                     new obj.constructor(obj.length) :
-                                     {};
-  for (const key in obj) {
-    clone[key] = goog.object.unsafeClone(obj[key]);
+  const type = goog.typeOf(obj);
+  if (type == 'object' || type == 'array') {
+    if (goog.isFunction(obj.clone)) {
+      return obj.clone();
+    }
+    const clone = type == 'array' ? [] : {};
+    for (const key in obj) {
+      clone[key] = goog.object.unsafeClone(obj[key]);
+    }
+    return clone;
   }
-  return clone;
+
+  return obj;
 };
 
 
